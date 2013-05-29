@@ -15,12 +15,25 @@ public class FilesWatch implements Runnable {
 	
 	@Override
 	public void run() {
-		HashMap<String, Integer> files = new HashMap<String, Integer>();
+		HashMap<String, Long> files = new HashMap<String, Long>();
+		boolean firstrun = true;
 		
 		while(running) {
-			
-			File folder = new File("./");
+			if(files.size() > 0) {
+				firstrun = false;
+			}
+			File folder = new File("plugins/");
 			for(File file : folder.listFiles()) {
+				if(!files.containsKey(file.getAbsolutePath())) {
+					if(!firstrun) {
+						plugin.getServer().broadcastMessage("[UA] New file found: " + file.getName());
+					}
+					files.put(file.getAbsolutePath(), file.lastModified());
+				} else if(file.lastModified() > files.get(file.getAbsolutePath())) {
+					plugin.getServer().broadcastMessage("[UA] File updated: " + file.getName());
+					files.put(file.getAbsolutePath(), file.lastModified());
+				}
+				
 				System.out.println(file.getAbsolutePath());
 			}
 			
